@@ -19,6 +19,13 @@ app.app_context().push()
 
 
 # make api routes
+
+@app.route("/")
+def homepage():
+    """Display the cupcake manager homepage"""
+    return render_template("index.html")
+
+
 @app.route("/api/cupcakes")
 def get_all_cupcakes():
     """Retrieve all cupcakes"""
