@@ -1,6 +1,5 @@
 """Flask app for Cupcakes"""
 from flask import abort
-import requests
 from models import db_connect, Cupcake, db, serialize
 from flask import Flask, redirect, render_template, request, jsonify
 
@@ -60,3 +59,28 @@ def create_cupcake():
     db.session.commit()
 
     return jsonify(cupcake=serialize(new_cake)), 201
+
+
+@app.route("/api/cupcakes/<int:cupcake_id>", methods=["PATCH"])
+def update_cupcake(cupcake_id):
+    """Update existing cupcake"""
+
+    cupcake = Cupcake.query.get_or_404(cupcake_id)
+    data = request.get_json()
+
+    for field, value in data.items():
+        setattr(cupcake, field, value)
+
+    db.session.commit()
+
+    return jsonify(cupcake=serialize(cupcake))
+
+
+@app.route("/api/cupcakes/<int:cupcake_id>", methods=['DELETE'])
+def delete_cupcake(cupcake_id):
+    """Delete cupcake from database"""
+    cupcake = Cupcake.query.get_or_404(cupcake_id)
+    db.session.delete(cupcake)
+    db.session.commit()
+
+    return jsonify(message="Cupcake deleted!")

@@ -107,3 +107,43 @@ class CupcakeViewsTestCase(TestCase):
             })
 
             self.assertEqual(Cupcake.query.count(), 2)
+
+    def test_update_cupcake(self):
+        """Test updating a cupcake"""
+        with app.test_client() as client:
+            # Create a cupcake in the database
+            cupcake = Cupcake(flavor="Chocolate", size="Large",
+                              rating=4.5, image="example.jpg")
+            db.session.add(cupcake)
+            db.session.commit()
+
+            # Get the cupcake_id dynamically
+            cupcake_id = cupcake.id
+
+            # Make a PATCH request to update the cupcake
+            response = client.patch(
+                f'/api/cupcakes/{cupcake_id}', json={"flavor": "Vanilla"})
+            updated_cupcake = Cupcake.query.get(cupcake_id)
+
+            # Assertions
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(updated_cupcake.flavor, "Vanilla")
+
+    def test_delete_cupcake(self):
+        """Test deleting a cupcake"""
+        with app.test_client() as client:
+            # Create a cupcake in the database
+            cupcake = Cupcake(flavor="Chocolate", size="Large",
+                              rating=4.5, image="example.jpg")
+            db.session.add(cupcake)
+            db.session.commit()
+
+            cupcake_id = cupcake.id
+
+            # Make a DELETE request to delete the cupcake
+            response = client.delete(f'/api/cupcakes/{cupcake_id}')
+            deleted_cupcake = Cupcake.query.get(cupcake_id)
+
+            # Assertions
+            self.assertEqual(response.status_code, 200)
+            self.assertIsNone(deleted_cupcake)
